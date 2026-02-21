@@ -10,45 +10,24 @@ This project trains a Q-learning style neural agent to convert winning KQK posit
 
 At the beginning of training, the agent is mostly exploratory and unstable: outcomes are noisy, checkmate frequency is low, and reward curves are dominated by tactical mistakes and draw cycles.
 
-## Why This Project Exists
+## Why?
 
-Most chess RL projects jump directly to full-board self-play and huge models.
-This one does the opposite:
+Most chess RL projects jump directly to full-board self-play and very large models.
+This project intentionally takes a controlled route:
 
 - Uses a **small solved domain** (KQK) so behavior is measurable.
 - Uses **structured features** instead of raw board pixels.
 - Uses **explicit reward shaping** tied to endgame geometry.
 - Compares behavior against optional **Syzygy tablebase** signals.
 
-This makes the project easier to explain on a resume and easier to debug scientifically.
+The result is a system that is easier to interpret, analyze, and improve methodically.
 
-## What You Can Do
+## Core Capabilities
 
 - Train a neural agent in a live dashboard with board animation.
 - Run headless experiments and log CSV artifacts.
 - Evaluate against heuristic, random, or Syzygy-based defenders.
 - Track win/draw/queen-loss trends and policy quality over time.
-
-## Project Layout
-
-```text
-chess_RL/
-  scripts/
-    kqk_neural.py          # main entry point (live/train/eval)
-  src/chess_rl/
-    env.py                 # KQK environment + reward shaping
-    neural_agent.py        # neural Q-agent (replay + target network)
-    train.py               # training loop
-    evaluate.py            # evaluation loop + metrics
-    live_viewer.py         # Tkinter + Matplotlib live UI
-    features.py            # structured state/action encoding
-    policies.py            # defender/attacker policies
-    syzygy.py              # tablebase oracle wrapper
-    syzygy_utils.py        # syzygy path discovery
-    endgames/kqk.py        # state abstraction + curriculum sampler
-  tests/
-  artifacts/               # model/log outputs (generated)
-```
 
 ## Tech Stack
 
@@ -114,7 +93,7 @@ See all options:
 PYTHONPATH=src python3 scripts/kqk_neural.py --help
 ```
 
-## How Training Works (Beginner-Friendly)
+## How Training Works
 
 Each episode:
 
@@ -242,23 +221,8 @@ PYTHONPATH=src python3 scripts/kqk_neural.py \
 Note:
 - `--require-syzygy` currently emits a warning when Syzygy is not loaded; it does not hard-fail.
 
-## Outputs
-
-By default:
-
-- Model: `artifacts/kqk_neural_q.pt`
-- Training log: `artifacts/kqk_neural_training.csv`
-
-These are intentionally excluded from git via `.gitignore`.
-
 ## Running Tests
 
 ```bash
 PYTHONPATH=src pytest -q
 ```
-
-## Resume-Ready Summary
-
-You can describe this project as:
-
-> Built a neural reinforcement-learning system for the solved chess endgame KQ vs K using structured state abstractions, shaped rewards, replay-based Q-learning, optional Syzygy tablebase integration, and a live training dashboard for real-time diagnostics and failure analysis.
