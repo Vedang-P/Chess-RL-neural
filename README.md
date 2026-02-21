@@ -1,12 +1,14 @@
 # Chess RL Endgames: Neural KQ vs K
 
 <p align="center">
-  <img src="assets/chess-rl-live.gif" alt="Live neural training dashboard (KQ vs K)" width="920" />
+  <img src="assets/training-beginning.gif" alt="Beginning of training: neural KQ vs K live dashboard" width="920" />
 </p>
 
 Neural reinforcement learning in a solved chess endgame: **King + Queen vs King (KQK)**.
 
 This project trains a Q-learning style neural agent to convert winning KQK positions into checkmate, while exposing training dynamics in a live GUI (board + metrics + outcomes).
+
+At the beginning of training, the agent is mostly exploratory and unstable: outcomes are noisy, checkmate frequency is low, and reward curves are dominated by tactical mistakes and draw cycles.
 
 ## Why This Project Exists
 
@@ -181,6 +183,14 @@ Per-step penalties + draw penalties dominate until agent reliably builds mating 
 4. Low loss does not guarantee good policy.
 A small TD loss can mean the model is fitting a mediocre fixed point (predicting similarly bad values), not that it found high-quality play.
 
+## Mid-Training Snapshot
+
+<p align="center">
+  <img src="assets/training-mid.gif" alt="Mid-training: improving neural KQ vs K behavior" width="920" />
+</p>
+
+By mid training, exploration has reduced and policy behavior becomes more structured. You should typically see fewer immediate blunders, better queen safety, and a clearer trend in rolling outcome metrics. This phase is where the agent transitions from "survival + random checks" to consistent king-confinement behavior.
+
 ## Practical Hyperparameter Tips
 
 If neural convergence is too slow, start here:
@@ -246,19 +256,6 @@ These are intentionally excluded from git via `.gitignore`.
 ```bash
 PYTHONPATH=src pytest -q
 ```
-
-## Add Your GIF at Top
-
-This README expects your demo GIF at:
-
-- `assets/chess-rl-live.gif`
-
-Suggested workflow:
-
-1. Record screen during live training.
-2. Convert to GIF (or use `ffmpeg` + `gifski`).
-3. Place file at `assets/chess-rl-live.gif`.
-4. Commit and push.
 
 ## Resume-Ready Summary
 
