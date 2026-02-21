@@ -134,10 +134,12 @@ class LiveTrainingViewer:
         self.rate_var = StringVar(value="Win rate: 0.0% | Draw rate: 0.0%")
         self.tb_var = StringVar(value="TB-optimal move rate: n/a")
 
-        self.board_size = args.board_size
-        self.board_margin = 28
-        self.square_size = self.board_size // 8
-        self.canvas_size = self.board_size + 2 * self.board_margin
+        self.requested_board_size = max(320, int(args.board_size))
+        self.board_size = self.requested_board_size
+        self.square_size = max(24, self.board_size // 8)
+        self.canvas_size = self.requested_board_size + 56
+        self.board_origin_x = 28
+        self.board_origin_y = 28
 
         self._build_ui()
         self._draw_board()
@@ -153,8 +155,8 @@ class LiveTrainingViewer:
 
         left = ttk.Frame(paned, padding=(6, 6, 12, 6))
         right = ttk.Frame(paned, padding=(6, 6, 6, 6))
-        paned.add(left, weight=5)
-        paned.add(right, weight=6)
+        paned.add(left, weight=1)
+        paned.add(right, weight=1)
 
         self.canvas = Canvas(
             left,
@@ -164,7 +166,8 @@ class LiveTrainingViewer:
             highlightthickness=0,
             bd=0,
         )
-        self.canvas.pack(side=TOP, fill=BOTH, expand=False)
+        self.canvas.pack(side=TOP, fill=BOTH, expand=True)
+        self.canvas.bind("<Configure>", self._on_canvas_resize)
 
         stat_grid = ttk.Frame(right)
         stat_grid.pack(side=TOP, fill=BOTH, expand=False)
@@ -220,6 +223,34 @@ class LiveTrainingViewer:
             if not allow_drop:
                 self.queue.put(payload)
 
+    def _on_canvas_resize(self, event: Any) -> None:
+        width = max(1, int(getattr(event, "width", 1)))
+        height = max(1, int(getattr(event, "height", 1)))
+        min_side = min(width, height)
+        if min_side < 120:
+            return
+
+        margin = max(8, int(min_side * 0.03))
+        usable = max(8 * 12, min_side - 2 * margin)
+        square_size = max(12, usable // 8)
+        board_size = square_size * 8
+        origin_x = (width - board_size) // 2
+        origin_y = (height - board_size) // 2
+
+        if (
+            square_size == self.square_size
+            and board_size == self.board_size
+            and origin_x == self.board_origin_x
+            and origin_y == self.board_origin_y
+        ):
+            return
+
+        self.square_size = square_size
+        self.board_size = board_size
+        self.board_origin_x = origin_x
+        self.board_origin_y = origin_y
+        self._draw_board()
+
     def _draw_board(self) -> None:
         self.canvas.delete("all")
         light = "#f0d9b5"
@@ -230,10 +261,10 @@ class LiveTrainingViewer:
         last_from = self.last_move.from_square if self.last_move else None
         last_to = self.last_move.to_square if self.last_move else None
         self.canvas.create_rectangle(
-            self.board_margin - 6,
-            self.board_margin - 6,
-            self.board_margin + self.board_size + 6,
-            self.board_margin + self.board_size + 6,
+            self.board_origin_x - 6,
+            self.board_origin_y - 6,
+            self.board_origin_x + self.board_size + 6,
+            self.board_origin_y + self.board_size + 6,
             fill=border,
             outline=border,
         )
@@ -242,8 +273,8 @@ class LiveTrainingViewer:
         for rank in range(8):
             for file_idx in range(8):
                 square = chess.square(file_idx, 7 - rank)
-                x0 = self.board_margin + file_idx * self.square_size
-                y0 = self.board_margin + rank * self.square_size
+                x0 = self.board_origin_x + file_idx * self.square_size
+                y0 = self.board_origin_y + rank * self.square_size
                 x1 = x0 + self.square_size
                 y1 = y0 + self.square_size
                 square_light = (rank + file_idx) % 2 == 0
@@ -738,4 +769,3 @@ class LiveTrainingViewer:
 def run_live_viewer(args: argparse.Namespace) -> None:
     viewer = LiveTrainingViewer(args)
     viewer.run()
-
