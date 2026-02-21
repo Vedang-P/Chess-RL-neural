@@ -148,18 +148,18 @@ The environment encourages fast, safe mating patterns:
 
 ## Why Neural Results Can Look Bad Early
 
-If you see low checkmate rates and high draw/queen-loss (like your screenshot), this is usually expected in early-to-mid training and comes from a few concrete factors:
+If you see low checkmate rates and high draw/queen-loss , this is usually expected in early-to-mid training and comes from a few concrete factors:
 
 1. Exploration is still high.
 At ~2000 episodes with default schedule, epsilon is often still around `0.20+`, so many random tactical blunders are still injected.
 
-2. Heuristic defender is non-trivial.
+1. Heuristic defender is non-trivial.
 The black defender actively seeks safer king geometry, making random/imperfect white play collapse into draws or queen losses.
 
-3. Most transitions are negative before mating is discovered.
+1. Most transitions are negative before mating is discovered.
 Per-step penalties + draw penalties dominate until agent reliably builds mating nets, so mean reward stays negative for a while.
 
-4. Low loss does not guarantee good policy.
+1. Low loss does not guarantee good policy.
 A small TD loss can mean the model is fitting a mediocre fixed point (predicting similarly bad values), not that it found high-quality play.
 
 ## Mid-Training Snapshot
@@ -197,7 +197,7 @@ Interpretation goal:
 
 ## Syzygy Setup (Optional, Recommended)
 
-Syzygy is optional. If missing, code falls back gracefully.
+Syzygy is optional. If missing, code has fallback.
 
 Download minimal KQK files:
 
